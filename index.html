@@ -16,34 +16,54 @@
 </head>
 
 <body>
-<header id="top">
-    <div class="row-fluid">
-        <div class="navbar navbar-inverse" role="navigation">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <img src="/images/logo.png" height="50"/>
-                <a class="navbar-brand" href="/"></a>
-            </div>
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="/">Home</a></li>
-                    <li class="active"><a href="/article">Datasets</a></li>
-                    <li class="active"><a href="/common/const.html">Benchmarks</a></li>
-                    <li class="active"><a href="/ui/typeface.html">Tutorials</a></li>
-                    <li class="active"><a href="/gulp/install.html">Contribute</a></li>
-                    <li class="active"><a href="/record/record.html">Events</a></li>
-                    <li class="active"><a href="/works/css3.html">Publications</a></li>
-                    
-                </ul>
-            </div>
-        </div>
-    </div>
+<header id="top" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1030;
+                         background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,.1);">
+  <div class="container-fluid">
+    <nav class="navbar navbar-default" style="background:#fff; border:none; margin:0;">
+      <div class="navbar-header">
+        <!-- 折叠按钮（左）-->
+        <button type="button" class="navbar-toggle collapsed"
+                data-toggle="collapse" data-target="#main-nav">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <!-- Logo + Brand -->
+        <a class="navbar-brand" href="/" style="color:#000;">
+          <img src="/images/logo.png"
+            height="50"
+            alt="logo"
+            style="display:inline-block;
+            vertical-align:middle;
+            margin-right:8px;
+            margin-top:-20px;">   <!-- ← 调节这里 -->
+          XDEBench
+        </a>
+      </div>
+
+      <!-- 导航菜单（右）-->
+      <div class="collapse navbar-collapse" id="main-nav">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/"         style="color:#000;">Home</a></li>
+          <li><a href="/article"  style="color:#000;">Datasets</a></li>
+          <li><a href="/common/const.html" style="color:#000;">Benchmarks</a></li>
+          <li><a href="/ui/typeface.html"  style="color:#000;">Tutorials</a></li>
+          <li><a href="/gulp/install.html" style="color:#000;">Contribute</a></li>
+          <li><a href="/record/record.html" style="color:#000;">Events</a></li>
+          <li><a href="/works/css3.html"    style="color:#000;">Publications</a></li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
 </header>
+
+<!-- 给页面主体加顶部 padding，防止被固定 header 遮住 -->
+<style>
+  body { padding-top: 100px; }  /* 根据 header 实际高度微调 */
+</style>
 
 <main class="bs-docs-masthead">
     <a href="javascript:void(0)" hidefocus="true">

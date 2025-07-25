@@ -33,7 +33,7 @@ input,textarea {
 }
 .container-fluid {
     margin-top: 20px;
-    margin-bottom: 60px;
+    margin-bottom: 0px;
 }
 .container-px {
     width: 1170px;
