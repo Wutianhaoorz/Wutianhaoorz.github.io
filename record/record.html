@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/css/docs.css" rel="stylesheet" type="text/css">
+    <link href="/css/syntax.css" rel="stylesheet" type="text/css">
+    <link href="http://10.10.21.150:8988/css/all-normal.css" rel="stylesheet" type="text/css">
+    <link href="/css/theme.css" rel="stylesheet" type="text/css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/docs.min.js"></script>
+</head>
+
+<body>
+<header id="top" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1030;
+                         background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,.1);">
+  <div class="container-fluid">
+    <nav class="navbar navbar-default" style="background:#fff; border:none; margin:0;">
+      <div class="navbar-header">
+        <!-- 折叠按钮（左）-->
+        <button type="button" class="navbar-toggle collapsed"
+                data-toggle="collapse" data-target="#main-nav">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <!-- Logo + Brand -->
+        <a class="navbar-brand" href="/" style="color:#000;">
+          <img src="/images/logo.png"
+            height="50"
+            alt="logo"
+            style="display:inline-block;
+            vertical-align:middle;
+            margin-right:8px;
+            margin-top:-20px;">   <!-- ← 调节这里 -->
+          XDEBench
+        </a>
+      </div>
+
+      <!-- 导航菜单（右）-->
+      <div class="collapse navbar-collapse" id="main-nav">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/"         style="color:#000;">Home</a></li>
+          <li><a href="/article"  style="color:#000;">Datasets</a></li>
+          <li><a href="/common/const.html" style="color:#000;">Benchmarks</a></li>
+          <li><a href="/ui/typeface.html"  style="color:#000;">Tutorials</a></li>
+          <li><a href="/gulp/install.html" style="color:#000;">Contribute</a></li>
+          <li><a href="/record/record.html" style="color:#000;">Events</a></li>
+          <li><a href="/works/css3.html"    style="color:#000;">Publications</a></li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- 给页面主体加顶部 padding，防止被固定 header 遮住 -->
+<style>
+  body { padding-top: 60px; }  /* 根据 header 实际高度微调 */
+</style>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 hidden-xs">
+            <div class="sidebar well">
+    
+</div>
+        </div>
+        <div class="col-md-8">
+            <div class="well">
+                <h1 class="none"><a href="record.html">经验谈</a></h1>
+                
+
+            </div>
+        </div>
+        <div class="col-md-2">
+            <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix-top">
+    <ul class="nav bs-docs-sidenav">
+        
+    </ul>
+    <a href="#top" class="back-to-top">返回顶部</a>
+</nav>
+        </div>
+    </div>
+</div>
+
+<footer class="footer navbar-inverse navbar-fixed-bottom">
+    <p class="copyright">&copy;2025 XDEBench</p>
+</footer>
+
+</body>
+</html>
+

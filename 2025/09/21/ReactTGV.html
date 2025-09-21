@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/css/docs.css" rel="stylesheet" type="text/css">
+    <link href="/css/syntax.css" rel="stylesheet" type="text/css">
+    <link href="http://10.10.21.150:8988/css/all-normal.css" rel="stylesheet" type="text/css">
+    <link href="/css/theme.css" rel="stylesheet" type="text/css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/docs.min.js"></script>
+</head>
+
+<body>
+<header id="top" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1030;
+                         background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,.1);">
+  <div class="container-fluid">
+    <nav class="navbar navbar-default" style="background:#fff; border:none; margin:0;">
+      <div class="navbar-header">
+        <!-- 折叠按钮（左）-->
+        <button type="button" class="navbar-toggle collapsed"
+                data-toggle="collapse" data-target="#main-nav">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <!-- Logo + Brand -->
+        <a class="navbar-brand" href="/" style="color:#000;">
+          <img src="/images/logo.png"
+            height="50"
+            alt="logo"
+            style="display:inline-block;
+            vertical-align:middle;
+            margin-right:8px;
+            margin-top:-20px;">   <!-- ← 调节这里 -->
+          XDEBench
+        </a>
+      </div>
+
+      <!-- 导航菜单（右）-->
+      <div class="collapse navbar-collapse" id="main-nav">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/"         style="color:#000;">Home</a></li>
+          <li><a href="/article"  style="color:#000;">Datasets</a></li>
+          <li><a href="/common/const.html" style="color:#000;">Benchmarks</a></li>
+          <li><a href="/ui/typeface.html"  style="color:#000;">Tutorials</a></li>
+          <li><a href="/gulp/install.html" style="color:#000;">Contribute</a></li>
+          <li><a href="/record/record.html" style="color:#000;">Events</a></li>
+          <li><a href="/works/css3.html"    style="color:#000;">Publications</a></li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- 给页面主体加顶部 padding，防止被固定 header 遮住 -->
+<style>
+  body { padding-top: 60px; }  /* 根据 header 实际高度微调 */
+</style>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 hidden-xs">
+            <div class="sidebar well">
+    
+        <h1>数据集分类</h1>
+<ul>
+  <!-- 项目1 -->
+  
+  <li><a href="/2025/09/21/ReactTGV.html">ReactTGV</a></li>
+
+  <!-- 项目2 -->
+  
+  <li><a href="">自然语言处理（）</a></li>
+
+  <!-- 项目3 -->
+  
+  <li><a href="">计算机视觉（）</a></li>
+
+  <!-- 想加就继续复制 <li>...</li> 整块，改标题即可 -->
+</ul>
+    
+</div>
+        </div>
+        <div class="col-md-8">
+            <div class="article">
+                <div class="well">
+                    <h1 class="none title">ReactTGV</h1>
+                    <div class="text-muted time">
+                        <span>发布时间：2025年09月21日</span>
+                        <span class="col-md-offset-1">作者：strick</span>
+                    </div>
+                    <div class="content">
+                        <p style="display:none">文章摘要写入位置。</p>
+<!--excerpt-->
+
+<h3 id="tgv-r-3d-reacting-taylorgreen-vortex">TGV-R (3D reacting Taylor–Green vortex)</h3>
+
+<h4 id="physical-description">Physical description</h4>
+<p>We consider a periodic cubic domain $\Omega=[0,L]^3$ discretized on a structured grid of $256\times256\times256$ cells, with side length $L=2\pi\,\mathrm{mm}$ and uniform spacing $\Delta x=L/256$. The fundamental wavenumber is $k=2\pi/L$. The initial velocity follows the Taylor–Green form:</p>
+
+<p>[
+u(\boldsymbol{x},0)=U_0\sin(kx)\cos(ky)\cos(kz),
+]</p>
+
+<p>[
+v(\boldsymbol{x},0)=-U_0\cos(kx)\sin(ky)\cos(kz),
+]</p>
+
+<p>[
+w(\boldsymbol{x},0)=0,
+]</p>
+
+<p>with Reynolds number $\mathrm{Re}=U_0 L/\nu(T_0)$ based on the kinematic viscosity $\nu$ at the reference temperature $T_0=300\,\mathrm{K}$. The composition is non-premixed and blended by a smooth mask:</p>
+
+<p>[
+\psi(\boldsymbol{x})=\tfrac12\Big[1+\tanh!\Big(c\,\frac{R_d(\boldsymbol{x})-R}{R}\Big)\Big],
+]</p>
+
+<p>where $R_d(\boldsymbol{x})$ is the distance to the prescribed mixing centerline or surface, $R$ sets the characteristic half-width, and $c$ controls interface sharpness (here fixed as $c=3$). Following the reference setup, we prescribe side values $Y_{\mathrm{H_2}}^{0}=0.0556$ on the fuel side and $Y_{\mathrm{O_2}}^{0}=0.233$ on the oxidizer side, with nitrogen complement elsewhere. The initial species fields are:</p>
+
+<p>[
+Y_{\mathrm{H_2}}(\boldsymbol{x},0)=Y_{\mathrm{H_2}}^{0}\,[1-\psi(\boldsymbol{x})],
+]</p>
+
+<p>[
+Y_{\mathrm{O_2}}(\boldsymbol{x},0)=Y_{\mathrm{O_2}}^{0}\,\psi(\boldsymbol{x}),
+]</p>
+
+<p>[
+Y_{\mathrm{N_2}}(\boldsymbol{x},0)=1-Y_{\mathrm{H_2}}(\boldsymbol{x},0)-Y_{\mathrm{O_2}}(\boldsymbol{x},0),
+]</p>
+
+<p>with all other species initially zero, and the pressure uniform at $p_0$. After blending, each grid point is brought to a thermochemical equilibrium state by solving a local equilibrium at $T_0=300\,\mathrm{K}$ and $p_0$, yielding the final initial temperature and species fields used to start the simulation.</p>
+
+<h4 id="simulation-method">Simulation method</h4>
+<p>Solutions are computed with the DeepFlame-based implicit DNS setup on the native mesh. The time step is fixed at $\Delta t=10^{-6}\,\mathrm{s}$. Snapshots are written every 10 time steps (that is, every $10\Delta t$), and each trajectory contains 40 uniformly spaced frames on the native mesh. The reaction mechanism is a reduced H$_2$/air scheme with nine species and twelve reversible reactions.</p>
+
+<h4 id="varied-physical-parameters">Varied physical parameters</h4>
+<p>We generate 16 trajectories by crossing two knobs that set the relative turbulence and mixing scales: $U_0\in{4,8,16,32}\,\mathrm{m/s}$, corresponding to $Re\approx{1.7\times10^3,\,3.3\times10^3,\,6.7\times10^3,\,1.3\times10^4}$, and the initial mixing half width $R\in{\tfrac{\pi}{4},\,\tfrac{3\pi}{8},\,\tfrac{\pi}{2},\,\tfrac{5\pi}{8}}\,\mathrm{mm}$. Increasing $U_0$ shortens the characteristic time scale and intensifies turbulence, while varying $R$ changes the initial layer thickness.</p>
+
+<h4 id="provided-data">Provided data</h4>
+<p>Each snapshot includes temperature $T$, pressure $p$, density $\rho$, velocity components $(u,v,w)$, and nine species mass fractions $Y_k$ (reduced $\mathrm{H_2}$–air mechanism). Data are provided on the native $256\times256\times256$ mesh together with spatial coordinates and a fixed train/validation/test split by trajectory. For memory-constrained experiments, we also release an $8\times$ downsampled version in each spatial direction.</p>
+
+                        <ul class="pager">
+                            
+                            <li class="previous"><a href="/2014/08/23/jekyll-clean-theme.html"><span aria-hidden="true">&larr;</span>上一篇：Jekyll Clean Theme</a></li>
+                            
+                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="footer navbar-inverse navbar-fixed-bottom">
+    <p class="copyright">&copy;2025 XDEBench</p>
+</footer>
+
+</body>
+</html>
+
