@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REALM: Benchmarking Neural Surrogates on Realistic Multiphysics Flows</title>
+    
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js (for Phase 3) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #e63946;
+            --secondary: #f77f00;
+            --accent: #06d6a0;
+            --background: #f8f9fa;
+            --surface: #ffffff;
+            --text-main: #212529;
+            --text-light: #6c757d;
+            --success: #06d6a0;
+            --warning: #ffd60a;
+            --danger: #e63946;
+            --border: #dee2e6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 2.8rem;
+            margin: 0 0 15px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #adb5bd;
+            max-width: 900px;
+            margin: 0 auto 30px;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            color: #ced4da;
+            margin-bottom: 10px;
+        }
+
+        .affiliation {
+            font-size: 0.85rem;
+            color: #adb5bd;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .btn-group {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { 
+            background: var(--primary); 
+            color: white; 
+        }
+        .btn-primary:hover { 
+            background: #d62828; 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.4);
+        }
+        
+        .btn-outline { 
+            border: 2px solid rgba(255,255,255,0.3); 
+            color: white; 
+        }
+        .btn-outline:hover { 
+            background: rgba(255,255,255,0.1); 
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        /* Sections */
+        section {
+            background: var(--surface);
+            margin: 30px 0;
+            padding: 50px 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            color: var(--text-main);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 15px;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h2 i {
+            color: var(--primary);
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .about-content p {
+            font-size: 1.05rem;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        .about-content strong {
+            color: var(--text-main);
+        }
+
+        .overview-image {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-top: 20px;
+        }
+
+        /* Dataset Overview */
+        .dataset-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-light);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Case Grid */
+        .case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .case-card {
+            background: var(--background);
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .case-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .case-card h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .case-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+
+        .case-meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .case-meta-label {
+            color: var(--text-light);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .case-meta-value {
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .case-description {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        /* Leaderboard */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .search-box, .filter-select {
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus, .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .search-box {
+            flex-grow: 1;
+            min-width: 250px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+            position: relative;
+        }
+
+        th:hover {
+            background: #dee2e6;
+        }
+
+        th i.fa-sort {
+            margin-left: 5px;
+            opacity: 0.5;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr.main-row:hover {
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        /* Detail Row */
+        tr.detail-row {
+            display: none;
+            background-color: #f8f9fa;
+        }
+
+        tr.detail-row.active {
+            display: table-row;
+        }
+
+        .detail-content {
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Badges */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-spectral { background: #dbeafe; color: #1e40af; }
+        .badge-conv { background: #dcfce7; color: #166534; }
+        .badge-transformer { background: #fce7f3; color: #9d174d; }
+        .badge-pointwise { background: #ffedd5; color: #9a3412; }
+        .badge-graph { background: #f3e8ff; color: #6b21a8; }
+
+        /* Performance Bar */
+        .bar-container {
+            height: 6px;
+            width: 100%;
+            background: #e9ecef;
+            border-radius: 3px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        /* Color coding */
+        .score-excellent { color: var(--success); font-weight: 700; }
+        .score-good { color: #52b788; font-weight: 600; }
+        .score-fair { color: var(--warning); }
+        .score-poor { color: var(--danger); }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 500px;
+            margin-top: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .meta-info { flex-direction: column; gap: 5px; }
+            .case-grid { grid-template-columns: 1fr; }
+            .chart-container { height: 350px; }
+        }
+
+        /* Highlights */
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .highlight-box h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .highlight-box ul {
+            margin-left: 20px;
+            color: var(--text-light);
+        }
+
+        .highlight-box li {
+            margin: 8px 0;
+        }
+
+        /* Checkbox styling */
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        label:has(input[type="checkbox"]) {
+            transition: background-color 0.2s;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        label:has(input[type="checkbox"]):hover {
+            background-color: rgba(230, 57, 70, 0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>REALM</h1>
+            <div class="subtitle">
+                Realistic AI Learning for Multiphysics: A Comprehensive Benchmark for Neural Surrogates on High-Fidelity Reactive Flows
+            </div>
+            
+            <div class="meta-info">
+                <span><i class="fas fa-user"></i> Runze Mao<sup>1,†</sup></span>
+                <span><i class="fas fa-user"></i> Rui Zhang<sup>1,†</sup></span>
+                <span><i class="fas fa-user"></i> Zhi X. Chen<sup>1,3,*</sup></span>
+                <span>+ 23 co-authors</span>
+            </div>
+            
+            <div class="affiliation">
+                <sup>1</sup>Peking University &nbsp;|&nbsp; 
+                <sup>2</sup>Renmin University of China &nbsp;|&nbsp; 
+                <sup>3</sup>AI for Science Institute &nbsp;|&nbsp;
+                <sup>4</sup>University of Calgary &nbsp;|&nbsp;
+                <sup>5</sup>Kyoto University &nbsp;|&nbsp;
+                <sup>6</sup>FM Global &nbsp;|&nbsp;
+                <sup>7</sup>LandSpace Technology &nbsp;|&nbsp;
+                <sup>8</sup>Aero Engine Academy of China
+                <br>
+                <sup>†</sup>Equal contribution &nbsp;|&nbsp; <sup>*</sup>Corresponding authors
+            </div>
+
+            <div class="btn-group">
+                <a href="#leaderboard" class="btn btn-primary">
+                    <i class="fas fa-trophy"></i> View Leaderboard
+                </a>
+                <a href="https://www.baidu.com/" class="btn btn-outline">
+                    <i class="fas fa-file-lines"></i> Paper
+                </a>
+                <a href="https://www.baidu.com/" class="btn btn-outline">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+                <a href="https://www.baidu.com/" class="btn btn-outline">
+                    <i class="fas fa-database"></i> Dataset
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- About REALM -->
+        <section>
+            <h2><i class="fas fa-info-circle"></i> About REALM</h2>
+            <div class="about-content">
+                <div>
+                    <p>
+                        <strong>REALM</strong>(Realistic AI Learning for Multiphysics) is the first comprehensive benchmark dedicated to evaluating neural surrogates on <strong>realistic spatiotemporal multiphysics flows</strong>. Unlike existing benchmarks that rely on simplified, low-dimensional problems, REALM tests models on challenging, application-driven reactive flow scenarios where traditional solvers struggle.
+                    </p>
+                    <p>
+                        The benchmark features <strong>11 high-fidelity datasets</strong> spanning canonical problems, high-Mach reactive flows, propulsion engines, and fire hazards. Each trajectory requires hundreds to thousands of CPU/GPU hours, placing REALM squarely in the regime where acceleration is practically valuable.
+                    </p>
+                    <p>
+                        We systematically evaluate <strong>12+ neural surrogate families</strong> including spectral operators, convolutional models, Transformers, pointwise operators, and graph/mesh networks, revealing three critical findings:
+                    </p>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3>Key Findings</h3>
+                    <ul>
+                        <li><strong>Scaling Barrier:</strong> Performance degrades rapidly with increasing dimensionality, stiffness, and mesh irregularity</li>
+                        <li><strong>Architecture Matters:</strong> Inductive biases dominate performance over raw parameter count</li>
+                        <li><strong>Accuracy Gap:</strong> High correlation metrics don't guarantee physically trustworthy behavior</li>
+                    </ul>
+                </div>
+
+                <img src="./images/fig1.png" alt="REALM Overview" class="overview-image">
+            </div>
+        </section>
+
+        <!-- Dataset Overview -->
+        <section>
+            <h2><i class="fas fa-layer-group"></i> Dataset Overview</h2>
+            
+            <div class="dataset-tabs">
+                <button class="tab-btn active" onclick="openDatasetTab(event, 'tab-2d-regular')">
+                    <i class="fas fa-border-all"></i> 2D Regular
+                </button>
+                <button class="tab-btn" onclick="openDatasetTab(event, 'tab-3d-regular')">
+                    <i class="fas fa-cube"></i> 3D Regular
+                </button>
+                <button class="tab-btn" onclick="openDatasetTab(event, 'tab-irregular')">
+                    <i class="fas fa-project-diagram"></i> Irregular Mesh
+                </button>
+            </div>
+
+            <!-- 2D Regular Cases -->
+            <div id="tab-2d-regular" class="tab-content active">
+                <div class="case-grid">
+                    <div class="case-card">
+                        <h3>IgnitHIT</h3>
+                        <div class="case-meta">
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Grid Size</span>
+                                <span class="case-meta-value">128×128</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Variables</span>
+                                <span class="case-meta-value">12</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Trajectories</span>
+                                <span class="case-meta-value">36</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Timesteps</span>
+                                <span class="case-meta-value">30</span>
+                            </div>
+                        </div>
+                        <p class="case-description">
+                            Ignition kernels in homogeneous isotropic turbulence. H₂/O₂ premixed flame evolution with turbulent wrinkling and kernel merging.
+                        </p>
+                    </div>
+
+                    <div class="case-card">
+                        <h3>EvolveJet</h3>
+                        <div class="case-meta">
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Grid Size</span>
+                                <span class="case-meta-value">256×256</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Variables</span>
+                                <span class="case-meta-value">39</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Trajectories</span>
+                                <span class="case-meta-value">30</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Timesteps</span>
+                                <span class="case-meta-value">40</span>
+                            </div>
+                        </div>
+                        <p class="case-description">
+                            Time-evolving CH₄/O₂ shear jet flame with mixing-driven stabilization and strain-induced extinction/reignition.
+                        </p>
+                    </div>
+
+                    <div class="case-card">
+                        <h3>PlanarDet</h3>
+                        <div class="case-meta">
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Grid Size</span>
+                                <span class="case-meta-value">832×384</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Variables</span>
+                                <span class="case-meta-value">13</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Trajectories</span>
+                                <span class="case-meta-value">9</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Timesteps</span>
+                                <span class="case-meta-value">50</span>
+                            </div>
+                        </div>
+                        <p class="case-description">
+                            Planar cellular detonation with shock-reaction coupling and characteristic cellular structures.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3D Regular Cases -->
+            <div id="tab-3d-regular" class="tab-content">
+                <div class="case-grid">
+                    <div class="case-card">
+                        <h3>ReactTGV</h3>
+                        <div class="case-meta">
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Grid Size</span>
+                                <span class="case-meta-value">256×256×256</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Variables</span>
+                                <span class="case-meta-value">11</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Trajectories</span>
+                                <span class="case-meta-value">16</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Timesteps</span>
+                                <span class="case-meta-value">40</span>
+                            </div>
+                        </div>
+                        <p class="case-description">
+                            Reacting Taylor-Green vortex with flame-vortex interaction, extinction, and reignition dynamics.
+                        </p>
+                    </div>
+
+                    <div class="case-card">
+                        <h3>PropHIT</h3>
+                        <div class="case-meta">
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Grid Size</span>
+                                <span class="case-meta-value">1025×129×129</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Variables</span>
+                                <span class="case-meta-value">13</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Trajectories</span>
+                                <span class="case-meta-value">7</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Timesteps</span>
+                                <span class="case-meta-value">35</span>
+                            </div>
+                        </div>
+                        <p class="case-description">
+                            Propagating H₂-air flame in homogeneous isotropic turbulence with varying pressure and turbulence intensity.
+                        </p>
+                    </div>
+
+                    <div class="case-card">
+                        <h3>PoolFire</h3>
+                        <div class="case-meta">
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Grid Size</span>
+                                <span class="case-meta-value">80×80×200</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Variables</span>
+                                <span class="case-meta-value">9</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Trajectories</span>
+                                <span class="case-meta-value">15</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Timesteps</span>
+                                <span class="case-meta-value">21</span>
+                            </div>
+                        </div>
+                        <p class="case-description">
+                            Buoyancy-driven CH₄ pool fire with plume entrainment, puffing, and McCaffrey regime transitions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Irregular Cases -->
+            <div id="tab-irregular" class="tab-content">
+                <div class="case-grid">
+                    <div class="case-card">
+                        <h3>SupCavityFlame</h3>
+                        <div class="case-meta">
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Cells</span>
+                                <span class="case-meta-value">2988480</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Variables</span>
+                                <span class="case-meta-value">12</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Trajectories</span>
+                                <span class="case-meta-value">9</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Timesteps</span>
+                                <span class="case-meta-value">101</span>
+                            </div>
+                        </div>
+                        <p class="case-description">
+                            Supersonic H₂ cavity flame with shock-shear-flame interactions and recirculation stabilization.
+                        </p>
+                    </div>
+
+                    <div class="case-card">
+                        <h3>ObstacleDet</h3>
+                        <div class="case-meta">
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Cells</span>
+                                <span class="case-meta-value">8996482</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Variables</span>
+                                <span class="case-meta-value">5</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Trajectories</span>
+                                <span class="case-meta-value">6</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Timesteps</span>
+                                <span class="case-meta-value">51</span>
+                            </div>
+                        </div>
+                        <p class="case-description">
+                            Detonation diffraction around obstacle with potential decoupling and re-initiation.
+                        </p>
+                    </div>
+
+                    <div class="case-card">
+                        <h3>SymmCoaxFlame</h3>
+                        <div class="case-meta">
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Cells</span>
+                                <span class="case-meta-value">294900</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Variables</span>
+                                <span class="case-meta-value">21</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Trajectories</span>
+                                <span class="case-meta-value">12</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Timesteps</span>
+                                <span class="case-meta-value">36</span>
+                            </div>
+                        </div>
+                        <p class="case-description">
+                            Single-element CH₄/O₂ rocket combustor with shear-coaxial injector and nozzle acceleration.
+                        </p>
+                    </div>
+
+                    <div class="case-card">
+                        <h3>MultiCoaxFlame</h3>
+                        <div class="case-meta">
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Cells</span>
+                                <span class="case-meta-value">13478444</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Variables</span>
+                                <span class="case-meta-value">22</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Trajectories</span>
+                                <span class="case-meta-value">5</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Timesteps</span>
+                                <span class="case-meta-value">91</span>
+                            </div>
+                        </div>
+                        <p class="case-description">
+                            Seven-element rocket combustor with multi-injector interactions and 3D turbulent mixing.
+                        </p>
+                    </div>
+
+                    <div class="case-card">
+                        <h3>FacadeFire</h3>
+                        <div class="case-meta">
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Cells</span>
+                                <span class="case-meta-value">2524423</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Variables</span>
+                                <span class="case-meta-value">9</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Trajectories</span>
+                                <span class="case-meta-value">9</span>
+                            </div>
+                            <div class="case-meta-item">
+                                <span class="case-meta-label">Timesteps</span>
+                                <span class="case-meta-value">101</span>
+                            </div>
+                        </div>
+                        <p class="case-description">
+                            Building facade fire with window venting, buoyant plume, and facade-guided flame attachment.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leaderboard -->
+        <section id="leaderboard">
+            <h2><i class="fas fa-trophy"></i> Interactive Leaderboard</h2>
+            
+            <div class="controls">
+                <input type="text" id="searchInput" class="search-box" placeholder="Search models or cases..." onkeyup="filterTable()">
+                
+                <select id="caseFilter" class="filter-select" onchange="filterTable()">
+                    <option value="all">All Cases</option>
+                    <option value="IgnitHIT">IgnitHIT</option>
+                    <option value="EvolveJet">EvolveJet</option>
+                    <option value="PlanarDet">PlanarDet</option>
+                    <option value="ReactTGV">ReactTGV</option>
+                    <option value="PropHIT">PropHIT</option>
+                    <option value="PoolFire">PoolFire</option>
+                    <option value="SupCavityFlame">SupCavityFlame</option>
+                    <option value="ObstacleDet">ObstacleDet</option>
+                    <option value="SymmCoaxFlame">SymmCoaxFlame</option>
+                    <option value="MultiCoaxFlame">MultiCoaxFlame</option>
+                    <option value="FacadeFire">FacadeFire</option>
+                </select>
+
+                <select id="familyFilter" class="filter-select" onchange="filterTable()">
+                    <option value="all">All Families</option>
+                    <option value="Spectral">Spectral</option>
+                    <option value="Convolutional">Convolutional</option>
+                    <option value="Transformer">Transformer</option>
+                    <option value="Pointwise">Pointwise</option>
+                    <option value="Graph/Mesh">Graph/Mesh</option>
+                </select>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="leaderboardTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('model')">Model <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('family')">Family</th>
+                            <th onclick="sortTable('case')">Case</th>
+                            <th onclick="sortTable('correlation')">Correlation <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('test_error')">Test Error <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('params')">Params (M) <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('infertime')">Infer Time (s) <i class="fas fa-sort"></i></th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <p style="text-align: right; color: var(--text-light); font-size: 0.9rem; margin-top: 15px;">
+                * Click on any row to view detailed metrics including training and validation errors.
+            </p>
+        </section>
+
+        <!-- Performance Analysis Charts -->
+        <section>
+            <h2><i class="fas fa-chart-scatter"></i> Performance Analysis</h2>
+            
+            <div class="dataset-tabs">
+                <button class="tab-btn active" onclick="openChartTab(event, 'chart-2d-regular')">
+                    <i class="fas fa-border-all"></i> 2D Regular
+                </button>
+                <button class="tab-btn" onclick="openChartTab(event, 'chart-3d-regular')">
+                    <i class="fas fa-cube"></i> 3D Regular
+                </button>
+                <button class="tab-btn" onclick="openChartTab(event, 'chart-irregular')">
+                    <i class="fas fa-project-diagram"></i> Irregular Mesh
+                </button>
+            </div>
+
+            <!-- 2D Regular Charts -->
+            <div id="chart-2d-regular" class="tab-content active">
+                <p style="color: var(--text-light); margin-bottom: 20px;">
+                    <strong>2D Regular Cases:</strong> Scatter plot showing correlation vs. inference speed. 
+                    Bubble size represents test error (smaller is better), color represents parameter count.
+                    Click on bubbles to highlight corresponding models in the leaderboard.
+                </p>
+                <div class="chart-container">
+                    <canvas id="scatter2DChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 3D Regular Charts -->
+            <div id="chart-3d-regular" class="tab-content">
+                <p style="color: var(--text-light); margin-bottom: 20px;">
+                    <strong>3D Regular Cases:</strong> Performance becomes more challenging with higher dimensionality.
+                    Models show increased error and reduced correlation compared to 2D cases.
+                </p>
+                <div class="chart-container">
+                    <canvas id="scatter3DChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Irregular Charts -->
+            <div id="chart-irregular" class="tab-content">
+                <p style="color: var(--text-light); margin-bottom: 20px;">
+                    <strong>Irregular Mesh Cases:</strong> Pointwise models (especially DeepONet) show better robustness 
+                    on irregular meshes compared to spectral/convolutional operators.
+                </p>
+                <div class="chart-container">
+                    <canvas id="scatterIrregChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Model Comparison Radar Chart -->
+        <section>
+            <h2><i class="fas fa-spider"></i> Multi-Dimensional Model Comparison</h2>
+            <p style="color: var(--text-light); margin-bottom: 20px;">
+                Radar chart comparing all 16 benchmarked models across key performance dimensions. 
+                Larger enclosed area indicates better overall trade-off.
+                <br>
+                <strong>Metrics (normalized 0-100%):</strong>
+                <span style="color: var(--primary); font-weight: 600;">Correlation</span> - prediction accuracy;
+                <span style="color: var(--primary); font-weight: 600;">Accuracy</span> - error metrics;
+                <span style="color: var(--primary); font-weight: 600;">Inference Speed</span> - throughput;
+                <span style="color: var(--primary); font-weight: 600;">Parameter Efficiency</span> - fewer parameters is better;
+                <span style="color: var(--primary); font-weight: 600;">Memory Efficiency</span> - lower memory footprint
+            </p>
+
+            <!-- Model Selection Controls -->
+            <div style="margin-bottom: 25px;">
+                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+                    <strong style="color: var(--text-main);">Select Models to Compare:</strong>
+                    <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9rem;" onclick="selectTopModels()">
+                        <i class="fas fa-star"></i> Top 5
+                    </button>
+                    <button class="btn btn-outline" style="padding: 8px 16px; font-size: 0.9rem; background: var(--surface); color: var(--text-main); border: 2px solid var(--border);" onclick="selectAllModels()">
+                        <i class="fas fa-layer-group"></i> All Models
+                    </button>
+                    <button class="btn btn-outline" style="padding: 8px 16px; font-size: 0.9rem; background: var(--surface); color: var(--text-main); border: 2px solid var(--border);" onclick="clearAllModels()">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+
+                <!-- Model Checkboxes Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; background: var(--background); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="FFNO" checked onchange="updateRadarChart()">
+                        <span class="badge badge-spectral" style="margin: 0;">FFNO</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="DeepONet" checked onchange="updateRadarChart()">
+                        <span class="badge badge-pointwise" style="margin: 0;">DeepONet</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="Transolver" checked onchange="updateRadarChart()">
+                        <span class="badge badge-transformer" style="margin: 0;">Transolver</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="CNext" checked onchange="updateRadarChart()">
+                        <span class="badge badge-conv" style="margin: 0;">CNext</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="DPOT" checked onchange="updateRadarChart()">
+                        <span class="badge badge-spectral" style="margin: 0;">DPOT</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="CROP" onchange="updateRadarChart()">
+                        <span class="badge badge-spectral" style="margin: 0;">CROP</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="FNO" onchange="updateRadarChart()">
+                        <span class="badge badge-spectral" style="margin: 0;">FNO</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="FactFormer" onchange="updateRadarChart()">
+                        <span class="badge badge-transformer" style="margin: 0;">FactFormer</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="GNOT" onchange="updateRadarChart()">
+                        <span class="badge badge-transformer" style="margin: 0;">GNOT</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="ONO" onchange="updateRadarChart()">
+                        <span class="badge badge-transformer" style="margin: 0;">ONO</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="UNO" onchange="updateRadarChart()">
+                        <span class="badge badge-spectral" style="margin: 0;">UNO</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="GraphSAGE" onchange="updateRadarChart()">
+                        <span class="badge badge-graph" style="margin: 0;">GraphSAGE</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="GraphUNet" onchange="updateRadarChart()">
+                        <span class="badge badge-graph" style="margin: 0;">GraphUNet</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="LSM" onchange="updateRadarChart()">
+                        <span class="badge badge-spectral" style="margin: 0;">LSM</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="MGN" onchange="updateRadarChart()">
+                        <span class="badge badge-graph" style="margin: 0;">MGN</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="model-checkbox" value="PointNet" onchange="updateRadarChart()">
+                        <span class="badge badge-pointwise" style="margin: 0;">PointNet</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="chart-container" style="height: 650px;">
+                <canvas id="radarChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Per-Case Performance Heatmap -->
+        <section>
+            <h2><i class="fas fa-th"></i> Per-Case Performance Matrix</h2>
+            <p style="color: var(--text-light); margin-bottom: 20px;">
+                Each dot represents one model-case pair. Dot size encodes correlation (larger = higher correlation), 
+                color encodes test error (green = low error, red = high error).
+            </p>
+            
+            <div class="dataset-tabs">
+                <button class="tab-btn active" onclick="openHeatmapTab(event, 'heatmap-test')">
+                    <i class="fas fa-vial"></i> Test Data
+                </button>
+                <button class="tab-btn" onclick="openHeatmapTab(event, 'heatmap-train')">
+                    <i class="fas fa-dumbbell"></i> Train Data
+                </button>
+            </div>
+
+            <div id="heatmap-test" class="tab-content active">
+                <div class="chart-container" style="height: 700px;">
+                    <canvas id="heatmapTestChart"></canvas>
+                </div>
+            </div>
+
+            <div id="heatmap-train" class="tab-content">
+                <div class="chart-container" style="height: 700px;">
+                    <canvas id="heatmapTrainChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Qualitative Results -->
+        <section>
+            <h2><i class="fas fa-eye"></i> Qualitative Results</h2>
+            
+            <div class="dataset-tabs">
+                <button class="tab-btn active" onclick="openQualTab(event, 'qual-2d')">
+                    2D Regular Cases
+                </button>
+                <button class="tab-btn" onclick="openQualTab(event, 'qual-3d')">
+                    3D Regular Cases
+                </button>
+                <button class="tab-btn" onclick="openQualTab(event, 'qual-irreg')">
+                    Irregular Mesh Cases
+                </button>
+            </div>
+
+            <div id="qual-2d" class="tab-content active">
+                <h3 style="margin-top: 0; color: var(--primary);">2D Regular Cases: Quantitative Errors and Visual Comparisons</h3>
+                <p style="color: var(--text-light); margin-bottom: 20px;">
+                    Representative snapshots showing OH mass fraction and velocity fields for IgnitHIT and EvolveJet cases,
+                    plus pressure fields for PlanarDet. FFNO consistently preserves fine-scale structures with lowest error growth.
+                </p>
+                <img src="./images/fig3.png" alt="2D Regular Results" class="overview-image">
+                
+                <h3 style="margin-top: 40px; color: var(--primary);">Extended Analysis: All Models</h3>
+                <img src="./images/extendfig1.png" alt="2D Extended Results" class="overview-image">
+            </div>
+
+            <div id="qual-3d" class="tab-content">
+                <h3 style="margin-top: 0; color: var(--primary);">3D Regular Cases: Quantitative Errors and Visual Comparisons</h3>
+                <p style="color: var(--text-light); margin-bottom: 20px;">
+                    Vorticity isosurfaces for ReactTGV, temperature isosurfaces for PoolFire showing buoyancy-driven pulsation,
+                    and flame propagation structures in PropHIT. 3D cases show markedly faster error accumulation.
+                </p>
+                <img src="./images/fig4.png" alt="3D Regular Results" class="overview-image">
+                
+                <h3 style="margin-top: 40px; color: var(--primary);">Extended Analysis: Correlation Evolution</h3>
+                <img src="./images/extendfig2.png" alt="3D Extended Results" class="overview-image">
+            </div>
+
+            <div id="qual-irreg" class="tab-content">
+                <h3 style="margin-top: 0; color: var(--primary);">Irregular Mesh Cases: Quantitative Errors and Visual Comparisons</h3>
+                <p style="color: var(--text-light); margin-bottom: 20px;">
+                    Temperature fields for SupCavityFlame, MultiCoaxFlame rocket combustor, and FacadeFire. 
+                    DeepONet shows comparative robustness on irregular meshes while graph-based models tend to over-smooth.
+                </p>
+                <img src="./images/fig5.png" alt="Irregular Results" class="overview-image">
+                
+                <h3 style="margin-top: 40px; color: var(--primary);">Extended Analysis: All Irregular Cases</h3>
+                <img src="./images/extendfig3.png" alt="Irregular Extended Results" class="overview-image">
+            </div>
+        </section>
+
+        <!-- Summary Figure -->
+        <section>
+            <h2><i class="fas fa-chart-line"></i> Cross-Benchmark Model Comparison</h2>
+            <p style="color: var(--text-light); margin-bottom: 20px;">
+                <strong>Left:</strong> Per-category scatter plots of correlation vs. inference efficiency. 
+                <strong>Middle:</strong> Radar chart of mean performance across all cases.
+                <strong>Right:</strong> Per-case performance summary showing train/test correlation distributions.
+            </p>
+            <img src="./images/fig6.png" alt="Summary Comparison" class="overview-image">
+        </section>
+
+    </div>
+
+    <script>
+        // ==================== DATA ====================
+        const leaderboardData = [
+            // IgnitHIT
+            {id: 1, model: "FFNO", family: "Spectral", case: "IgnitHIT", correlation: 0.97357, test_error: 1.8739, params: 8.94, infertime: 0.15, train_error: 0.518, val_error: 1.864},
+            {id: 2, model: "CNext", family: "Convolutional", case: "IgnitHIT", correlation: 0.96087, test_error: 2.7122, params: 0.459, infertime: 0.439, train_error: 2.467, val_error: 3.174},
+            {id: 3, model: "CROP", family: "Spectral", case: "IgnitHIT", correlation: 0.94906, test_error: 4.3738, params: 65.1, infertime: 0.780, train_error: 0.203, val_error: 5.245},
+            {id: 4, model: "FactFormer", family: "Transformer", case: "IgnitHIT", correlation: 0.95699, test_error: 2.9051, params: 9.21, infertime: 0.664, train_error: 0.616, val_error: 2.741},
+            {id: 5, model: "DeepONet", family: "Pointwise", case: "IgnitHIT", correlation: 0.68603, test_error: 48.248, params: 0.382, infertime: 0.078, train_error: 39.627, val_error: 48.539},
+            
+            // EvolveJet
+            {id: 6, model: "FFNO", family: "Spectral", case: "EvolveJet", correlation: 0.95078, test_error: 0.979, params: 78.7, infertime: 0.275, train_error: 0.539, val_error: 2.498},
+            {id: 7, model: "CNext", family: "Convolutional", case: "EvolveJet", correlation: 0.92558, test_error: 2.588, params: 28.9, infertime: 0.465, train_error: 1.055, val_error: 4.249},
+            {id: 8, model: "FactFormer", family: "Transformer", case: "EvolveJet", correlation: 0.92762, test_error: 1.545, params: 9.22, infertime: 0.879, train_error: 0.567, val_error: 2.148},
+            {id: 9, model: "DeepONet", family: "Pointwise", case: "EvolveJet", correlation: 0.62205, test_error: 18.331, params: 0.831, infertime: 0.235, train_error: 7.854, val_error: 28.788},
+            
+            // PlanarDet
+            {id: 10, model: "FFNO", family: "Spectral", case: "PlanarDet", correlation: 0.99144, test_error: 9.538, params: 8.94, infertime: 0.365, train_error: 13.399, val_error: 12.577},
+            {id: 11, model: "CNext", family: "Convolutional", case: "PlanarDet", correlation: 0.89513, test_error: 25.134, params: 28.8, infertime: 0.537, train_error: 10.241, val_error: 10.954},
+            {id: 12, model: "FactFormer", family: "Transformer", case: "PlanarDet", correlation: 0.98904, test_error: 11.836, params: 9.21, infertime: 1.168, train_error: 11.364, val_error: 15.974},
+            {id: 13, model: "DPOT", family: "Spectral", case: "PlanarDet", correlation: 0.98468, test_error: 12.187, params: 41.1, infertime: 0.793, train_error: 8.723, val_error: 16.275},
+            
+            // ReactTGV
+            {id: 14, model: "FFNO", family: "Spectral", case: "ReactTGV", correlation: 0.89590, test_error: 18.446, params: 13.1, infertime: 0.370, train_error: 1.481, val_error: 1.837},
+            {id: 15, model: "CNext", family: "Convolutional", case: "ReactTGV", correlation: 0.87934, test_error: 32.223, params: 35.6, infertime: 0.691, train_error: 5.930, val_error: 4.164},
+            {id: 16, model: "DeepONet", family: "Pointwise", case: "ReactTGV", correlation: 0.23663, test_error: 65.633, params: 0.076, infertime: 7.098, train_error: 29.313, val_error: 31.192},
+            
+            // PropHIT
+            {id: 17, model: "DPOT", family: "Spectral", case: "PropHIT", correlation: 0.41330, test_error: 49.856, params: 70.3, infertime: 0.766, train_error: 78.383, val_error: 136.14},
+            {id: 18, model: "CNext", family: "Convolutional", case: "PropHIT", correlation: 0.44553, test_error: 64.965, params: 0.680, infertime: 0.384, train_error: 85.627, val_error: 137.11},
+            {id: 19, model: "Transolver", family: "Transformer", case: "PropHIT", correlation: 0.39358, test_error: 61.347, params: 0.281, infertime: 0.426, train_error: 141.37, val_error: 149.70},
+            
+            // PoolFire
+            {id: 20, model: "DeepONet", family: "Pointwise", case: "PoolFire", correlation: 0.76791, test_error: 23.242, params: 0.013, infertime: 2.615, train_error: 26.715, val_error: 11.051},
+            {id: 21, model: "DPOT", family: "Spectral", case: "PoolFire", correlation: 0.92327, test_error: 25.935, params: 68.2, infertime: 0.421, train_error: 12.318, val_error: 12.007},
+            {id: 22, model: "FFNO", family: "Spectral", case: "PoolFire", correlation: 0.84658, test_error: 24.691, params: 13.1, infertime: 0.240, train_error: 14.566, val_error: 11.817},
+            
+            // SupCavityFlame
+            {id: 23, model: "LSM", family: "Spectral", case: "SupCavityFlame", correlation: 0.75046, test_error: 33.851, params: 118.7, infertime: 0.578, train_error: 27.487, val_error: 36.600},
+            {id: 24, model: "DeepONet", family: "Pointwise", case: "SupCavityFlame", correlation: 0.79271, test_error: 34.423, params: 0.016, infertime: 0.218, train_error: 26.823, val_error: 40.111},
+            {id: 25, model: "PointNet", family: "Pointwise", case: "SupCavityFlame", correlation: 0.76024, test_error: 37.366, params: 0.919, infertime: 0.139, train_error: 33.678, val_error: 47.484},
+            {id: 26, model: "Transolver", family: "Transformer", case: "SupCavityFlame", correlation: 0.75247, test_error: 37.939, params: 0.186, infertime: 0.186, train_error: 30.625, val_error: 40.065},
+            
+            // ObstacleDet
+            {id: 27, model: "DeepONet", family: "Pointwise", case: "ObstacleDet", correlation: 0.96460, test_error: 57.137, params: 0.051, infertime: 0.266, train_error: 84.087, val_error: 60.735},
+            {id: 28, model: "LSM", family: "Spectral", case: "ObstacleDet", correlation: 0.97671, test_error: 60.311, params: 33.5, infertime: 0.979, train_error: 88.534, val_error: 54.179},
+            {id: 29, model: "GraphUNet", family: "Graph/Mesh", case: "ObstacleDet", correlation: 0.93926, test_error: 81.314, params: 0.891, infertime: 22.953, train_error: 85.434, val_error: 134.14},
+            
+            // SymmCoaxFlame
+            {id: 30, model: "DeepONet", family: "Pointwise", case: "SymmCoaxFlame", correlation: 0.79584, test_error: 29.564, params: 0.532, infertime: 0.321, train_error: 27.354, val_error: 27.818},
+            {id: 31, model: "LSM", family: "Spectral", case: "SymmCoaxFlame", correlation: 0.71576, test_error: 35.544, params: 118.7, infertime: 0.798, train_error: 29.637, val_error: 27.304},
+            {id: 32, model: "Transolver", family: "Transformer", case: "SymmCoaxFlame", correlation: 0.68579, test_error: 47.192, params: 0.188, infertime: 0.303, train_error: 46.059, val_error: 38.529},
+            
+            // MultiCoaxFlame
+            {id: 33, model: "DeepONet", family: "Pointwise", case: "MultiCoaxFlame", correlation: 0.70615, test_error: 31.841, params: 0.118, infertime: 0.850, train_error: 27.646, val_error: 25.961},
+            
+            // FacadeFire
+            {id: 34, model: "DeepONet", family: "Pointwise", case: "FacadeFire", correlation: 0.94302, test_error: 24.957, params: 0.332, infertime: 0.212, train_error: 28.477, val_error: 35.691},
+            {id: 35, model: "Transolver", family: "Transformer", case: "FacadeFire", correlation: 0.94152, test_error: 26.387, params: 0.035, infertime: 0.157, train_error: 31.791, val_error: 36.741},
+            {id: 36, model: "GraphUNet", family: "Graph/Mesh", case: "FacadeFire", correlation: 0.93435, test_error: 28.142, params: 7.91, infertime: 13.201, train_error: 31.615, val_error: 38.452},
+        ];
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function getFamilyBadgeClass(family) {
+            if (family === "Spectral") return "badge-spectral";
+            if (family === "Convolutional") return "badge-conv";
+            if (family === "Transformer") return "badge-transformer";
+            if (family === "Pointwise") return "badge-pointwise";
+            return "badge-graph";
+        }
+
+        function getScoreClass(correlation) {
+            if (correlation >= 0.95) return "score-excellent";
+            if (correlation >= 0.85) return "score-good";
+            if (correlation >= 0.70) return "score-fair";
+            return "score-poor";
+        }
+
+        // ==================== TABLE RENDERING ====================
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(row => {
+                // Main Row
+                const tr = document.createElement('tr');
+                tr.className = 'main-row';
+                tr.onclick = () => toggleDetails(row.id);
+
+                const corrClass = getScoreClass(row.correlation);
+                const badgeClass = getFamilyBadgeClass(row.family);
+
+                tr.innerHTML = `
+                    <td><strong>${row.model}</strong></td>
+                    <td><span class="badge ${badgeClass}">${row.family}</span></td>
+                    <td>${row.case}</td>
+                    <td class="${corrClass}">${row.correlation.toFixed(5)}</td>
+                    <td>${row.test_error.toFixed(3)}</td>
+                    <td>${row.params.toFixed(3)}</td>
+                    <td>${row.infertime.toFixed(3)}</td>
+                    <td style="text-align:center;"><i class="fas fa-chevron-down" style="color:var(--text-light)"></i></td>
+                `;
+                tbody.appendChild(tr);
+
+                // Detail Row
+                const detailTr = document.createElement('tr');
+                detailTr.className = 'detail-row';
+                detailTr.id = `detail-${row.id}`;
+                detailTr.innerHTML = `
+                    <td colspan="8">
+                        <div class="detail-content">
+                            <div class="stat-box">
+                                <div class="stat-label">Train Error</div>
+                                <div class="stat-value">${row.train_error.toFixed(3)}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Val Error</div>
+                                <div class="stat-value">${row.val_error.toFixed(3)}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Test Error</div>
+                                <div class="stat-value">${row.test_error.toFixed(3)}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Correlation</div>
+                                <div class="stat-value">${row.correlation.toFixed(5)}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Parameters (M)</div>
+                                <div class="stat-value">${row.params.toFixed(3)}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Inference Time (s)</div>
+                                <div class="stat-value">${row.infertime.toFixed(3)}</div>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(detailTr);
+            });
+        }
+
+        function toggleDetails(id) {
+            const el = document.getElementById(`detail-${id}`);
+            if (el.classList.contains('active')) {
+                el.classList.remove('active');
+            } else {
+                document.querySelectorAll('.detail-row').forEach(r => r.classList.remove('active'));
+                el.classList.add('active');
+            }
+        }
+
+        // ==================== FILTERING ====================
+        function filterTable() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const caseFilter = document.getElementById('caseFilter').value;
+            const familyFilter = document.getElementById('familyFilter').value;
+
+            const filtered = leaderboardData.filter(row => {
+                const matchesSearch = row.model.toLowerCase().includes(search) || 
+                                    row.case.toLowerCase().includes(search);
+                const matchesCase = caseFilter === 'all' || row.case === caseFilter;
+                const matchesFamily = familyFilter === 'all' || row.family === familyFilter;
+                
+                return matchesSearch && matchesCase && matchesFamily;
+            });
+
+            renderTable(filtered);
+        }
+
+        // ==================== SORTING ====================
+        let sortDirection = 1;
+        function sortTable(key) {
+            sortDirection *= -1;
+            const sorted = [...leaderboardData].sort((a, b) => {
+                if (a[key] < b[key]) return -1 * sortDirection;
+                if (a[key] > b[key]) return 1 * sortDirection;
+                return 0;
+            });
+            renderTable(sorted);
+        }
+
+        // ==================== TAB SWITCHING ====================
+        function openDatasetTab(evt, tabId) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            const tabBtns = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+        
+        // ==================== CHART UTILITIES ====================
+        function getCategoryData(category) {
+            const categoryMap = {
+                '2d': ['IgnitHIT', 'EvolveJet', 'PlanarDet'],
+                '3d': ['ReactTGV', 'PropHIT', 'PoolFire'],
+                'irregular': ['SupCavityFlame', 'ObstacleDet', 'SymmCoaxFlame', 'MultiCoaxFlame', 'FacadeFire']
+            };
+            
+            return leaderboardData.filter(row => categoryMap[category].includes(row.case));
+        }
+
+        function getFamilyColor(family) {
+            const colors = {
+                'Spectral': '#2563eb',
+                'Convolutional': '#16a34a',
+                'Transformer': '#db2777',
+                'Pointwise': '#ea580c',
+                'Graph/Mesh': '#7c3aed'
+            };
+            return colors[family] || '#6b7280';
+        }
+
+        // ==================== SCATTER CHARTS ====================
+        function createScatterChart(canvasId, category) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const data = getCategoryData(category);
+            
+            // Group by family
+            const families = ['Spectral', 'Convolutional', 'Transformer', 'Pointwise', 'Graph/Mesh'];
+            const datasets = families.map(family => {
+                const familyData = data.filter(d => d.family === family);
+                return {
+                    label: family,
+                    data: familyData.map(d => ({
+                        x: d.correlation,
+                        y: 1 / d.infertime, // Rollouts per second
+                        r: Math.max(5, 30 - d.test_error * 0.3), // Bubble size
+                        model: d.model,
+                        case: d.case,
+                        test_error: d.test_error,
+                        params: d.params
+                    })),
+                    backgroundColor: getFamilyColor(family) + '99',
+                    borderColor: getFamilyColor(family),
+                    borderWidth: 2
+                };
+            });
+
+            new Chart(ctx, {
+                type: 'bubble',
+                data: { datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { font: { size: 12 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const p = context.raw;
+                                    return [
+                                        `${p.model} (${context.dataset.label})`,
+                                        `Case: ${p.case}`,
+                                        `Correlation: ${p.x.toFixed(4)}`,
+                                        `Speed: ${p.y.toFixed(2)} rollouts/s`,
+                                        `Test Error: ${p.test_error.toFixed(2)}`,
+                                        `Params: ${p.params.toFixed(2)}M`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Correlation (Higher is Better)', font: { size: 14 } },
+                            min: 0.2,
+                            max: 1.0
+                        },
+                        y: {
+                            type: 'logarithmic',
+                            title: { display: true, text: 'Inference Speed (Rollouts/sec, Higher is Better)', font: { size: 14 } },
+                            min: 0.01,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+// ==================== RADAR CHART ====================
+        let radarChartInstance = null; // Store chart instance for updates
+
+        const allRadarData = {
+            'CNext': {
+                memory: 0.8762,
+                accuracy: 0.8409,
+                correlation: 0.7570,
+                parameters: 0.5522,
+                inference: 0.5172,
+                family: 'Convolutional'
+            },
+            'CROP': {
+                memory: 0.8647,
+                accuracy: 0.7764,
+                correlation: 0.6760,
+                parameters: 0.1386,
+                inference: 0.3793,
+                family: 'Spectral'
+            },
+            'DPOT': {
+                memory: 0.8513,
+                accuracy: 0.8675,
+                correlation: 0.7030,
+                parameters: 0.3454,
+                inference: 0.3103,
+                family: 'Spectral'
+            },
+            'DeepONet': {
+                memory: 0.7701,
+                accuracy: 0.7400,
+                correlation: 0.3920,
+                parameters: 0.9142,
+                inference: 0.8793,
+                family: 'Pointwise'
+            },
+            'FFNO': {
+                memory: 0.5959,
+                accuracy: 0.8827,
+                correlation: 1.0000,
+                parameters: 0.3795,
+                inference: 0.7586,
+                family: 'Spectral'
+            },
+            'FNO': {
+                memory: 0.5758,
+                accuracy: 0.7562,
+                correlation: 0.5680,
+                parameters: 0.2068,
+                inference: 1.0000,
+                family: 'Spectral'
+            },
+            'FactFormer': {
+                memory: 0.5012,
+                accuracy: 1.0000,
+                correlation: 0.8920,
+                parameters: 0.4136,
+                inference: 0.2414,
+                family: 'Transformer'
+            },
+            'GNOT': {
+                memory: 0.4670,
+                accuracy: 0.7368,
+                correlation: 0.4590,
+                parameters: 0.6898,
+                inference: 0.7931,
+                family: 'Transformer'
+            },
+            'ONO': {
+                memory: 0.4665,
+                accuracy: 0.5191,
+                correlation: 0.2160,
+                parameters: 0.7932,
+                inference: 0.0000,
+                family: 'Transformer'
+            },
+            'Transolver': {
+                memory: 0.3451,
+                accuracy: 0.5823,
+                correlation: 0.2970,
+                parameters: 0.7590,
+                inference: 0.6620,
+                family: 'Transformer'
+            },
+            'UNO': {
+                memory: 0.3628,
+                accuracy: 0.7605,
+                correlation: 0.5950,
+                parameters: 0.0000,
+                inference: 0.1724,
+                family: 'Spectral'
+            },
+            'GraphSAGE': {
+                memory: 0.8558,
+                accuracy: 0.0000,
+                correlation: 0.0000,
+                parameters: 1.0000,
+                inference: 0.8966,
+                family: 'Graph/Mesh'
+            },
+            'GraphUNet': {
+                memory: 0.6680,
+                accuracy: 0.5399,
+                correlation: 0.2160,
+                parameters: 0.6205,
+                inference: 0.4138,
+                family: 'Graph/Mesh'
+            },
+            'LSM': {
+                memory: 0.1738,
+                accuracy: 0.7102,
+                correlation: 0.3510,
+                parameters: 0.3795,
+                inference: 0.5172,
+                family: 'Spectral'
+            },
+            'MGN': {
+                memory: 0.2609,
+                accuracy: 0.0918,
+                correlation: 0.0540,
+                parameters: 0.7932,
+                inference: 0.9310,
+                family: 'Graph/Mesh'
+            },
+            'PointNet': {
+                memory: 0.2559,
+                accuracy: 0.4906,
+                correlation: 0.2160,
+                parameters: 0.4829,
+                inference: 0.7241,
+                family: 'Pointwise'
+            }
+        };
+
+        function createRadarChart(selectedModels = ['FFNO', 'DeepONet', 'Transolver', 'CNext', 'DPOT']) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (radarChartInstance) {
+                radarChartInstance.destroy();
+            }
+            
+            const datasets = selectedModels.map(modelName => {
+                const data = allRadarData[modelName];
+                if (!data) return null;
+                
+                return {
+                    label: modelName,
+                    data: [
+                        data.correlation * 100,      // Correlation
+                        data.accuracy * 100,         // Accuracy
+                        data.inference * 100,        // Inference Speed
+                        data.parameters * 100,       // Parameter Efficiency
+                        data.memory * 100            // Memory Efficiency
+                    ],
+                    backgroundColor: getFamilyColor(data.family) + '33',
+                    borderColor: getFamilyColor(data.family),
+                    borderWidth: 2,
+                    pointBackgroundColor: getFamilyColor(data.family),
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                };
+            }).filter(d => d !== null);
+
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'Correlation',
+                        'Accuracy', 
+                        'Inference Speed',
+                        'Parameter Efficiency',
+                        'Memory Efficiency'
+                    ],
+                    datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { 
+                                font: { size: 12, weight: 'bold' },
+                                padding: 12,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const labels = ['Correlation', 'Accuracy', 'Inference Speed', 'Parameter Efficiency', 'Memory Efficiency'];
+                                    return context.dataset.label + ' - ' + labels[context.dataIndex] + ': ' + context.parsed.r.toFixed(1) + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            min: 0,
+                            ticks: { 
+                                stepSize: 20,
+                                font: { size: 11 },
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            pointLabels: {
+                                font: { size: 12, weight: 'bold' }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            angleLines: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update radar chart based on checkbox selection
+        function updateRadarChart() {
+            const checkboxes = document.querySelectorAll('.model-checkbox');
+            const selectedModels = [];
+            
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    selectedModels.push(cb.value);
+                }
+            });
+            
+            if (selectedModels.length === 0) {
+                if (radarChartInstance) {
+                    radarChartInstance.destroy();
+                    radarChartInstance = null;
+                }
+                return;
+            }
+            
+            createRadarChart(selectedModels);
+        }
+
+        // Select top 5 models
+        function selectTopModels() {
+            const topModels = ['FFNO', 'DeepONet', 'Transolver', 'CNext', 'DPOT'];
+            const checkboxes = document.querySelectorAll('.model-checkbox');
+            
+            checkboxes.forEach(cb => {
+                cb.checked = topModels.includes(cb.value);
+            });
+            
+            updateRadarChart();
+        }
+
+        // Select all models
+        function selectAllModels() {
+            const checkboxes = document.querySelectorAll('.model-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = true;
+            });
+            updateRadarChart();
+        }
+
+        // Clear all selections
+        function clearAllModels() {
+            const checkboxes = document.querySelectorAll('.model-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+            });
+            updateRadarChart();
+        }
+
+        // ==================== HEATMAP CHART ====================
+        function createHeatmapChart(canvasId, useTestData) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            // Get unique cases and models
+            const cases = [...new Set(leaderboardData.map(d => d.case))];
+            const models = [...new Set(leaderboardData.map(d => d.model))];
+            
+            // Create scatter data
+            const scatterData = [];
+            leaderboardData.forEach((row, idx) => {
+                const caseIdx = cases.indexOf(row.case);
+                const modelIdx = models.indexOf(row.model);
+                
+                const error = useTestData ? row.test_error : row.train_error;
+                const corr = row.correlation;
+                
+                scatterData.push({
+                    x: caseIdx,
+                    y: modelIdx,
+                    r: corr * 15 + 5, // Bubble size based on correlation
+                    error: error,
+                    correlation: corr,
+                    model: row.model,
+                    case: row.case
+                });
+            });
+
+            // Color scale: green (low error) to red (high error)
+            const maxError = Math.max(...scatterData.map(d => d.error));
+            const minError = Math.min(...scatterData.map(d => d.error));
+            
+            const coloredData = scatterData.map(d => {
+                const normalized = (d.error - minError) / (maxError - minError);
+                const r = Math.round(239 + (230 - 239) * normalized);
+                const g = Math.round(68 + (185 - 68) * (1 - normalized));
+                const b = Math.round(68 + (129 - 68) * (1 - normalized));
+                
+                return {
+                    ...d,
+                    backgroundColor: `rgba(${r}, ${g}, ${b}, 0.7)`,
+                    borderColor: `rgb(${r}, ${g}, ${b})`
+                };
+            });
+
+            new Chart(ctx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: useTestData ? 'Test Performance' : 'Train Performance',
+                        data: coloredData
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const p = context.raw;
+                                    return [
+                                        `Model: ${p.model}`,
+                                        `Case: ${p.case}`,
+                                        `Correlation: ${p.correlation.toFixed(4)}`,
+                                        `Error: ${p.error.toFixed(3)}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'category',
+                            labels: cases,
+                            title: { display: true, text: 'Case', font: { size: 14 } },
+                            ticks: { autoSkip: false, font: { size: 10 } }
+                        },
+                        y: {
+                            type: 'category',
+                            labels: models,
+                            title: { display: true, text: 'Model', font: { size: 14 } },
+                            ticks: { autoSkip: false, font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==================== TAB SWITCHING FOR CHARTS ====================
+        function openChartTab(evt, tabId) {
+            const parent = evt.currentTarget.parentElement.parentElement;
+            const tabContents = parent.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            const tabBtns = parent.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove("active");
+            }
+            
+            parent.querySelector(`#${tabId}`).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function openHeatmapTab(evt, tabId) {
+            openChartTab(evt, tabId);
+        }
+
+        function openQualTab(evt, tabId) {
+            openChartTab(evt, tabId);
+        }
+
+        // ==================== CHART INITIALIZATION ====================
+        function initAllCharts() {
+            // Scatter charts
+            createScatterChart('scatter2DChart', '2d');
+            createScatterChart('scatter3DChart', '3d');
+            createScatterChart('scatterIrregChart', 'irregular');
+            
+            // Radar chart
+            createRadarChart();
+            
+            // Heatmaps
+            createHeatmapChart('heatmapTestChart', true);
+            createHeatmapChart('heatmapTrainChart', false);
+        }
+
+        // ==================== INITIALIZATION ====================
+        window.onload = function() {
+            renderTable(leaderboardData);
+            
+            // Initialize charts with slight delay to ensure DOM is ready
+            setTimeout(() => {
+                initAllCharts();
+            }, 100);
+        };
+
+    </script>
+
+</body>
+</html>
