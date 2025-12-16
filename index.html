@@ -1077,7 +1077,7 @@
         </section>
 
         <!-- Per-Case Performance Heatmap -->
-        <section>
+        <!-- <section>
             <h2><i class="fas fa-th"></i> Per-Case Performance Matrix</h2>
             <p style="color: var(--text-light); margin-bottom: 20px;">
                 Each dot represents one model-case pair. Dot size encodes correlation (larger = higher correlation), 
@@ -1104,7 +1104,7 @@
                     <canvas id="heatmapTrainChart"></canvas>
                 </div>
             </div>
-        </section>
+        </section> -->
 
         <!-- Qualitative Results -->
         <section>
@@ -1175,63 +1175,96 @@
     <script>
         // ==================== DATA ====================
         const leaderboardData = [
-            // IgnitHIT
-            {id: 1, model: "FFNO", family: "Spectral", case: "IgnitHIT", correlation: 0.97357, test_error: 1.8739, params: 8.94, infertime: 0.15, train_error: 0.518, val_error: 1.864},
-            {id: 2, model: "CNext", family: "Convolutional", case: "IgnitHIT", correlation: 0.96087, test_error: 2.7122, params: 0.459, infertime: 0.439, train_error: 2.467, val_error: 3.174},
-            {id: 3, model: "CROP", family: "Spectral", case: "IgnitHIT", correlation: 0.94906, test_error: 4.3738, params: 65.1, infertime: 0.780, train_error: 0.203, val_error: 5.245},
-            {id: 4, model: "FactFormer", family: "Transformer", case: "IgnitHIT", correlation: 0.95699, test_error: 2.9051, params: 9.21, infertime: 0.664, train_error: 0.616, val_error: 2.741},
-            {id: 5, model: "DeepONet", family: "Pointwise", case: "IgnitHIT", correlation: 0.68603, test_error: 48.248, params: 0.382, infertime: 0.078, train_error: 39.627, val_error: 48.539},
-            
-            // EvolveJet
-            {id: 6, model: "FFNO", family: "Spectral", case: "EvolveJet", correlation: 0.95078, test_error: 0.979, params: 78.7, infertime: 0.275, train_error: 0.539, val_error: 2.498},
-            {id: 7, model: "CNext", family: "Convolutional", case: "EvolveJet", correlation: 0.92558, test_error: 2.588, params: 28.9, infertime: 0.465, train_error: 1.055, val_error: 4.249},
-            {id: 8, model: "FactFormer", family: "Transformer", case: "EvolveJet", correlation: 0.92762, test_error: 1.545, params: 9.22, infertime: 0.879, train_error: 0.567, val_error: 2.148},
-            {id: 9, model: "DeepONet", family: "Pointwise", case: "EvolveJet", correlation: 0.62205, test_error: 18.331, params: 0.831, infertime: 0.235, train_error: 7.854, val_error: 28.788},
-            
-            // PlanarDet
-            {id: 10, model: "FFNO", family: "Spectral", case: "PlanarDet", correlation: 0.99144, test_error: 9.538, params: 8.94, infertime: 0.365, train_error: 13.399, val_error: 12.577},
-            {id: 11, model: "CNext", family: "Convolutional", case: "PlanarDet", correlation: 0.89513, test_error: 25.134, params: 28.8, infertime: 0.537, train_error: 10.241, val_error: 10.954},
-            {id: 12, model: "FactFormer", family: "Transformer", case: "PlanarDet", correlation: 0.98904, test_error: 11.836, params: 9.21, infertime: 1.168, train_error: 11.364, val_error: 15.974},
-            {id: 13, model: "DPOT", family: "Spectral", case: "PlanarDet", correlation: 0.98468, test_error: 12.187, params: 41.1, infertime: 0.793, train_error: 8.723, val_error: 16.275},
-            
-            // ReactTGV
-            {id: 14, model: "FFNO", family: "Spectral", case: "ReactTGV", correlation: 0.89590, test_error: 18.446, params: 13.1, infertime: 0.370, train_error: 1.481, val_error: 1.837},
-            {id: 15, model: "CNext", family: "Convolutional", case: "ReactTGV", correlation: 0.87934, test_error: 32.223, params: 35.6, infertime: 0.691, train_error: 5.930, val_error: 4.164},
-            {id: 16, model: "DeepONet", family: "Pointwise", case: "ReactTGV", correlation: 0.23663, test_error: 65.633, params: 0.076, infertime: 7.098, train_error: 29.313, val_error: 31.192},
-            
-            // PropHIT
-            {id: 17, model: "DPOT", family: "Spectral", case: "PropHIT", correlation: 0.41330, test_error: 49.856, params: 70.3, infertime: 0.766, train_error: 78.383, val_error: 136.14},
-            {id: 18, model: "CNext", family: "Convolutional", case: "PropHIT", correlation: 0.44553, test_error: 64.965, params: 0.680, infertime: 0.384, train_error: 85.627, val_error: 137.11},
-            {id: 19, model: "Transolver", family: "Transformer", case: "PropHIT", correlation: 0.39358, test_error: 61.347, params: 0.281, infertime: 0.426, train_error: 141.37, val_error: 149.70},
-            
-            // PoolFire
-            {id: 20, model: "DeepONet", family: "Pointwise", case: "PoolFire", correlation: 0.76791, test_error: 23.242, params: 0.013, infertime: 2.615, train_error: 26.715, val_error: 11.051},
-            {id: 21, model: "DPOT", family: "Spectral", case: "PoolFire", correlation: 0.92327, test_error: 25.935, params: 68.2, infertime: 0.421, train_error: 12.318, val_error: 12.007},
-            {id: 22, model: "FFNO", family: "Spectral", case: "PoolFire", correlation: 0.84658, test_error: 24.691, params: 13.1, infertime: 0.240, train_error: 14.566, val_error: 11.817},
-            
-            // SupCavityFlame
-            {id: 23, model: "LSM", family: "Spectral", case: "SupCavityFlame", correlation: 0.75046, test_error: 33.851, params: 118.7, infertime: 0.578, train_error: 27.487, val_error: 36.600},
-            {id: 24, model: "DeepONet", family: "Pointwise", case: "SupCavityFlame", correlation: 0.79271, test_error: 34.423, params: 0.016, infertime: 0.218, train_error: 26.823, val_error: 40.111},
-            {id: 25, model: "PointNet", family: "Pointwise", case: "SupCavityFlame", correlation: 0.76024, test_error: 37.366, params: 0.919, infertime: 0.139, train_error: 33.678, val_error: 47.484},
-            {id: 26, model: "Transolver", family: "Transformer", case: "SupCavityFlame", correlation: 0.75247, test_error: 37.939, params: 0.186, infertime: 0.186, train_error: 30.625, val_error: 40.065},
-            
-            // ObstacleDet
-            {id: 27, model: "DeepONet", family: "Pointwise", case: "ObstacleDet", correlation: 0.96460, test_error: 57.137, params: 0.051, infertime: 0.266, train_error: 84.087, val_error: 60.735},
-            {id: 28, model: "LSM", family: "Spectral", case: "ObstacleDet", correlation: 0.97671, test_error: 60.311, params: 33.5, infertime: 0.979, train_error: 88.534, val_error: 54.179},
-            {id: 29, model: "GraphUNet", family: "Graph/Mesh", case: "ObstacleDet", correlation: 0.93926, test_error: 81.314, params: 0.891, infertime: 22.953, train_error: 85.434, val_error: 134.14},
-            
-            // SymmCoaxFlame
-            {id: 30, model: "DeepONet", family: "Pointwise", case: "SymmCoaxFlame", correlation: 0.79584, test_error: 29.564, params: 0.532, infertime: 0.321, train_error: 27.354, val_error: 27.818},
-            {id: 31, model: "LSM", family: "Spectral", case: "SymmCoaxFlame", correlation: 0.71576, test_error: 35.544, params: 118.7, infertime: 0.798, train_error: 29.637, val_error: 27.304},
-            {id: 32, model: "Transolver", family: "Transformer", case: "SymmCoaxFlame", correlation: 0.68579, test_error: 47.192, params: 0.188, infertime: 0.303, train_error: 46.059, val_error: 38.529},
-            
-            // MultiCoaxFlame
-            {id: 33, model: "DeepONet", family: "Pointwise", case: "MultiCoaxFlame", correlation: 0.70615, test_error: 31.841, params: 0.118, infertime: 0.850, train_error: 27.646, val_error: 25.961},
-            
-            // FacadeFire
-            {id: 34, model: "DeepONet", family: "Pointwise", case: "FacadeFire", correlation: 0.94302, test_error: 24.957, params: 0.332, infertime: 0.212, train_error: 28.477, val_error: 35.691},
-            {id: 35, model: "Transolver", family: "Transformer", case: "FacadeFire", correlation: 0.94152, test_error: 26.387, params: 0.035, infertime: 0.157, train_error: 31.791, val_error: 36.741},
-            {id: 36, model: "GraphUNet", family: "Graph/Mesh", case: "FacadeFire", correlation: 0.93435, test_error: 28.142, params: 7.91, infertime: 13.201, train_error: 31.615, val_error: 38.452},
+            {"id": 1, "model": "CNext", "family": "Convolutional", "case": "PlanarDet", "correlation": 0.89513, "test_error": 25.134, "params": 28.826, "infertime": 0.537, "train_error": 10.241, "val_error": 10.954, "memory": 3.796},
+            {"id": 2, "model": "CROP", "family": "Spectral", "case": "PlanarDet", "correlation": 0.95567, "test_error": 24.026, "params": 591.735, "infertime": 0.573, "train_error": 15.338, "val_error": 31.644, "memory": 8.882},
+            {"id": 3, "model": "DPOT", "family": "Spectral", "case": "PlanarDet", "correlation": 0.98468, "test_error": 12.187, "params": 41.071, "infertime": 0.793, "train_error": 8.723, "val_error": 16.275, "memory": 13.113},
+            {"id": 4, "model": "DeepONet", "family": "Pointwise", "case": "PlanarDet", "correlation": 0.78803, "test_error": 31.197, "params": 0.017, "infertime": 0.127, "train_error": 51.233, "val_error": 34.156, "memory": 15.412},
+            {"id": 5, "model": "FFNO", "family": "Spectral", "case": "PlanarDet", "correlation": 0.99144, "test_error": 9.538, "params": 8.937, "infertime": 0.365, "train_error": 13.399, "val_error": 12.577, "memory": 15.558},
+            {"id": 6, "model": "FNO", "family": "Spectral", "case": "PlanarDet", "correlation": 0.89918, "test_error": 27.104, "params": 134.271, "infertime": 0.131, "train_error": 40.389, "val_error": 27.911, "memory": 14.591},
+            {"id": 7, "model": "FactFormer", "family": "Transformer", "case": "PlanarDet", "correlation": 0.98904, "test_error": 11.836, "params": 9.215, "infertime": 1.168, "train_error": 11.364, "val_error": 15.974, "memory": 48.282},
+            {"id": 8, "model": "GNOT", "family": "Transformer", "case": "PlanarDet", "correlation": 0.60514, "test_error": 98.392, "params": 4.363, "infertime": 0.325, "train_error": 149.77, "val_error": 73.912, "memory": 48.784},
+            {"id": 9, "model": "ONO", "family": "Transformer", "case": "PlanarDet", "correlation": 0.53047, "test_error": 93.993, "params": 0.223, "infertime": 4.7, "train_error": 94.133, "val_error": 50.452, "memory": 48.756},
+            {"id": 10, "model": "Transolver", "family": "Transformer", "case": "PlanarDet", "correlation": 0.83098, "test_error": 39.074, "params": 0.563, "infertime": 0.489, "train_error": 125.722, "val_error": 53.032, "memory": 48.769},
+            {"id": 11, "model": "UNO", "family": "Spectral", "case": "PlanarDet", "correlation": 0.9181, "test_error": 34.412, "params": 2093.553, "infertime": 1.427, "train_error": 28.632, "val_error": 34.318, "memory": 33.247},
+            {"id": 12, "model": "CNext", "family": "Convolutional", "case": "EvolveJet", "correlation": 0.93064, "test_error": 2.588, "params": 28.856, "infertime": 0.465, "train_error": 1.055, "val_error": 4.249, "memory": 0.828},
+            {"id": 13, "model": "CROP", "family": "Spectral", "case": "EvolveJet", "correlation": 0.87258, "test_error": 3.408, "params": 65.107, "infertime": 0.383, "train_error": 1.661, "val_error": 3.699, "memory": 1.02},
+            {"id": 14, "model": "DPOT", "family": "Spectral", "case": "EvolveJet", "correlation": 0.92364, "test_error": 3.361, "params": 9.172, "infertime": 0.518, "train_error": 2.099, "val_error": 5.32, "memory": 1.554},
+            {"id": 15, "model": "DeepONet", "family": "Pointwise", "case": "EvolveJet", "correlation": 0.77295, "test_error": 18.331, "params": 0.831, "infertime": 0.235, "train_error": 7.854, "val_error": 28.788, "memory": 5.775},
+            {"id": 16, "model": "FFNO", "family": "Spectral", "case": "EvolveJet", "correlation": 0.97774, "test_error": 0.979, "params": 78.703, "infertime": 0.275, "train_error": 0.539, "val_error": 2.498, "memory": 5.237},
+            {"id": 17, "model": "FNO", "family": "Spectral", "case": "EvolveJet", "correlation": 0.9068, "test_error": 2.97, "params": 1208.14, "infertime": 0.112, "train_error": 0.958, "val_error": 7.212, "memory": 18.041},
+            {"id": 18, "model": "FactFormer", "family": "Transformer", "case": "EvolveJet", "correlation": 0.96935, "test_error": 1.544, "params": 9.221, "infertime": 0.879, "train_error": 0.567, "val_error": 2.148, "memory": 22.766},
+            {"id": 19, "model": "GNOT", "family": "Transformer", "case": "EvolveJet", "correlation": 0.92987, "test_error": 7.47, "params": 4.383, "infertime": 0.254, "train_error": 5.032, "val_error": 12.567, "memory": 27.269},
+            {"id": 20, "model": "ONO", "family": "Transformer", "case": "EvolveJet", "correlation": 0.51455, "test_error": 70.962, "params": 1.248, "infertime": 2.894, "train_error": 75.289, "val_error": 88.59, "memory": 27.295},
+            {"id": 21, "model": "Transolver", "family": "Transformer", "case": "EvolveJet", "correlation": 0.58629, "test_error": 56.099, "params": 3.1, "infertime": 0.465, "train_error": 71.499, "val_error": 77.775, "memory": 27.292},
+            {"id": 22, "model": "UNO", "family": "Spectral", "case": "EvolveJet", "correlation": 0.86212, "test_error": 4.09, "params": 235.049, "infertime": 0.778, "train_error": 4.164, "val_error": 5.313, "memory": 25.571},
+            {"id": 23, "model": "CNext", "family": "Convolutional", "case": "IgnitHIT", "correlation": 0.95893, "test_error": 2.712, "params": 0.459, "infertime": 0.439, "train_error": 2.467, "val_error": 3.174, "memory": 0.096},
+            {"id": 24, "model": "CROP", "family": "Spectral", "case": "IgnitHIT", "correlation": 0.9371, "test_error": 4.374, "params": 65.099, "infertime": 0.78, "train_error": 0.203, "val_error": 5.244, "memory": 0.984},
+            {"id": 25, "model": "DPOT", "family": "Spectral", "case": "IgnitHIT", "correlation": 0.91859, "test_error": 5.901, "params": 36.198, "infertime": 0.668, "train_error": 1.465, "val_error": 6.149, "memory": 1.212},
+            {"id": 26, "model": "DeepONet", "family": "Pointwise", "case": "IgnitHIT", "correlation": 0.42481, "test_error": 48.248, "params": 0.382, "infertime": 0.078, "train_error": 39.627, "val_error": 48.54, "memory": 1.588},
+            {"id": 27, "model": "FFNO", "family": "Spectral", "case": "IgnitHIT", "correlation": 0.97138, "test_error": 1.874, "params": 8.936, "infertime": 0.15, "train_error": 0.518, "val_error": 1.864, "memory": 1.66},
+            {"id": 28, "model": "FNO", "family": "Spectral", "case": "IgnitHIT", "correlation": 0.90045, "test_error": 6.911, "params": 8.408, "infertime": 0.059, "train_error": 5.499, "val_error": 8.453, "memory": 1.632},
+            {"id": 29, "model": "FactFormer", "family": "Transformer", "case": "IgnitHIT", "correlation": 0.95574, "test_error": 2.905, "params": 9.214, "infertime": 0.664, "train_error": 0.616, "val_error": 2.741, "memory": 2.532},
+            {"id": 30, "model": "GNOT", "family": "Transformer", "case": "IgnitHIT", "correlation": 0.83822, "test_error": 13.38, "params": 4.363, "infertime": 0.203, "train_error": 8.179, "val_error": 12.94, "memory": 2.565},
+            {"id": 31, "model": "ONO", "family": "Transformer", "case": "IgnitHIT", "correlation": 0.67128, "test_error": 39.596, "params": 6.417, "infertime": 5.233, "train_error": 38.208, "val_error": 46.32, "memory": 2.631},
+            {"id": 32, "model": "Transolver", "family": "Transformer", "case": "IgnitHIT", "correlation": 0.85766, "test_error": 13.925, "params": 3.09, "infertime": 0.538, "train_error": 14.861, "val_error": 23.25, "memory": 2.648},
+            {"id": 33, "model": "UNO", "family": "Spectral", "case": "IgnitHIT", "correlation": 0.92125, "test_error": 5.592, "params": 378.082, "infertime": 0.671, "train_error": 1.031, "val_error": 4.882, "memory": 5.645},
+            {"id": 34, "model": "CNext", "family": "Convolutional", "case": "PropHIT", "correlation": 0.44553, "test_error": 64.965, "params": 0.68, "infertime": 0.384, "train_error": 85.627, "val_error": 137.112, "memory": 7.751},
+            {"id": 35, "model": "CROP", "family": "Spectral", "case": "PropHIT", "correlation": 0.25469, "test_error": 82.875, "params": 134.237, "infertime": 0.401, "train_error": 31.045, "val_error": 181.968, "memory": 6.737},
+            {"id": 36, "model": "DPOT", "family": "Spectral", "case": "PropHIT", "correlation": 0.41330, "test_error": 49.856, "params": 70.345, "infertime": 0.766, "train_error": 78.383, "val_error": 136.142, "memory": 6.716},
+            {"id": 37, "model": "DeepONet", "family": "Pointwise", "case": "PropHIT", "correlation": 0.12463, "test_error": 68.479, "params": 0.018, "infertime": 4.005, "train_error": 68.799, "val_error": 159.503, "memory": 16.320},
+            {"id": 38, "model": "FFNO", "family": "Spectral", "case": "PropHIT", "correlation": 0.30569, "test_error": 69.034, "params": 0.864, "infertime": 0.190, "train_error": 68.196, "val_error": 150.142, "memory": 16.850},
+            {"id": 39, "model": "FNO", "family": "Spectral", "case": "PropHIT", "correlation": 0.23687, "test_error": 91.666, "params": 268.455, "infertime": 0.196, "train_error": 120.175, "val_error": 193.725, "memory": 14.853},
+            {"id": 40, "model": "Transolver", "family": "Transformer", "case": "PropHIT", "correlation": 0.39358, "test_error": 61.347, "params": 0.281, "infertime": 0.426, "train_error": 141.369, "val_error": 149.701, "memory": 29.150},
+            {"id": 41, "model": "UNO", "family": "Spectral", "case": "PropHIT", "correlation": 0.21644, "test_error": 83.604, "params": 73.668, "infertime": 0.993, "train_error": 47.453, "val_error": 159.423, "memory": 33.595},
+            {"id": 42, "model": "CNext", "family": "Convolutional", "case": "PoolFire", "correlation": 0.62052, "test_error": 29.449, "params": 35.564, "infertime": 0.472, "train_error": 23.913, "val_error": 14.599, "memory": 9.489},
+            {"id": 43, "model": "CROP", "family": "Spectral", "case": "PoolFire", "correlation": 0.76847, "test_error": 27.962, "params": 134.236, "infertime": 0.357, "train_error": 3.931, "val_error": 14.232, "memory": 8.606},
+            {"id": 44, "model": "DPOT", "family": "Spectral", "case": "PoolFire", "correlation": 0.88877, "test_error": 25.935, "params": 68.243, "infertime": 0.421, "train_error": 12.318, "val_error": 12.007, "memory": 8.730},
+            {"id": 45, "model": "DeepONet", "family": "Pointwise", "case": "PoolFire", "correlation": 0.81595, "test_error": 23.242, "params": 0.013, "infertime": 2.615, "train_error": 26.715, "val_error": 11.051, "memory": 9.385},
+            {"id": 46, "model": "FFNO", "family": "Spectral", "case": "PoolFire", "correlation": 0.87243, "test_error": 24.691, "params": 13.130, "infertime": 0.240, "train_error": 14.566, "val_error": 11.817, "memory": 30.331},
+            {"id": 47, "model": "FNO", "family": "Spectral", "case": "PoolFire", "correlation": 0.80643, "test_error": 25.324, "params": 268.454, "infertime": 0.112, "train_error": 6.671, "val_error": 12.729, "memory": 28.380},
+            {"id": 48, "model": "Transolver", "family": "Transformer", "case": "PoolFire", "correlation": 0.60377, "test_error": 29.182, "params": 1.449, "infertime": 0.451, "train_error": 33.178, "val_error": 11.919, "memory": 37.849},
+            {"id": 49, "model": "UNO", "family": "Spectral", "case": "PoolFire", "correlation": 0.85909, "test_error": 29.186, "params": 77.501, "infertime": 0.771, "train_error": 24.372, "val_error": 15.211, "memory": 40.706},
+            {"id": 50, "model": "CNext", "family": "Convolutional", "case": "ReactTGV", "correlation": 0.92748, "test_error": 32.223, "params": 35.571, "infertime": 0.691, "train_error": 5.930, "val_error": 4.164, "memory": 14.992},
+            {"id": 51, "model": "CROP", "family": "Spectral", "case": "ReactTGV", "correlation": 0.59453, "test_error": 65.092, "params": 134.237, "infertime": 0.473, "train_error": 18.558, "val_error": 25.671, "memory": 14.109},
+            {"id": 52, "model": "DPOT", "family": "Spectral", "case": "ReactTGV", "correlation": 0.84172, "test_error": 38.761, "params": 240.186, "infertime": 0.863, "train_error": 2.853, "val_error": 6.220, "memory": 12.952},
+            {"id": 53, "model": "DeepONet", "family": "Pointwise", "case": "ReactTGV", "correlation": 0.46155, "test_error": 65.633, "params": 0.076, "infertime": 7.097, "train_error": 29.313, "val_error": 31.192, "memory": 31.977},
+            {"id": 54, "model": "FFNO", "family": "Spectral", "case": "ReactTGV", "correlation": 0.94586, "test_error": 18.446, "params": 13.131, "infertime": 0.370, "train_error": 1.481, "val_error": 1.837, "memory": 49.696},
+            {"id": 55, "model": "FNO", "family": "Spectral", "case": "ReactTGV", "correlation": 0.52869, "test_error": 69.544, "params": 268.454, "infertime": 0.190, "train_error": 2.301, "val_error": 24.082, "memory": 47.745},
+            {"id": 56, "model": "Transolver", "family": "Transformer", "case": "ReactTGV", "correlation": 0.28040, "test_error": 148.391, "params": 0.281, "infertime": 0.686, "train_error": 100.027, "val_error": 80.459, "memory": 44.792},
+            {"id": 57, "model": "UNO", "family": "Spectral", "case": "ReactTGV", "correlation": 0.65624, "test_error": 63.151, "params": 94.508, "infertime": 1.119, "train_error": 15.606, "val_error": 11.308, "memory": 49.076},
+            {"id": 58, "model": "DeepONet", "family": "Pointwise", "case": "ObstacleDet", "correlation": 0.96460, "test_error": 57.137, "params": 0.051, "infertime": 0.266, "train_error": 84.087, "val_error": 60.735, "memory": 2.941},
+            {"id": 59, "model": "GraphSAGE", "family": "Graph/Mesh", "case": "ObstacleDet", "correlation": 0.50415, "test_error": 203.096, "params": 0.013, "infertime": 0.228, "train_error": 208.207, "val_error": 219.625, "memory": 2.984},
+            {"id": 60, "model": "GraphUNet", "family": "Graph/Mesh", "case": "ObstacleDet", "correlation": 0.93926, "test_error": 81.314, "params": 0.891, "infertime": 22.953, "train_error": 85.434, "val_error": 134.137, "memory": 17.692},
+            {"id": 61, "model": "LSM", "family": "Spectral", "case": "ObstacleDet", "correlation": 0.97671, "test_error": 60.311, "params": 33.528, "infertime": 0.979, "train_error": 88.534, "val_error": 54.179, "memory": 28.034},
+            {"id": 62, "model": "MGN", "family": "Graph/Mesh", "case": "ObstacleDet", "correlation": 0.49494, "test_error": 185.014, "params": 0.045, "infertime": 0.184, "train_error": 193.538, "val_error": 237.554, "memory": 28.163},
+            {"id": 63, "model": "PointNet", "family": "Pointwise", "case": "ObstacleDet", "correlation": 0.87323, "test_error": 135.383, "params": 0.918, "infertime": 0.401, "train_error": 147.755, "val_error": 168.842, "memory": 28.283},
+            {"id": 64, "model": "Transolver", "family": "Transformer", "case": "ObstacleDet", "correlation": 0.90047, "test_error": 131.295, "params": 0.185, "infertime": 0.403, "train_error": 150.759, "val_error": 126.049, "memory": 28.285},
+            {"id": 65, "model": "DeepONet", "family": "Pointwise", "case": "SupCavityFlame", "correlation": 0.79271, "test_error": 34.423, "params": 0.016, "infertime": 0.218, "train_error": 26.823, "val_error": 40.111, "memory": 2.194},
+            {"id": 66, "model": "GraphSAGE", "family": "Graph/Mesh", "case": "SupCavityFlame", "correlation": 0.71465, "test_error": 43.665, "params": 0.014, "infertime": 0.134, "train_error": 37.306, "val_error": 50.671, "memory": 2.202},
+            {"id": 67, "model": "GraphUNet", "family": "Graph/Mesh", "case": "SupCavityFlame", "correlation": 0.73988, "test_error": 43.698, "params": 0.060, "infertime": 5.096, "train_error": 37.224, "val_error": 41.139, "memory": 8.381},
+            {"id": 68, "model": "LSM", "family": "Spectral", "case": "SupCavityFlame", "correlation": 0.75046, "test_error": 33.851, "params": 118.715, "infertime": 0.578, "train_error": 27.487, "val_error": 36.600, "memory": 47.112},
+            {"id": 69, "model": "MGN", "family": "Graph/Mesh", "case": "SupCavityFlame", "correlation": 0.74568, "test_error": 38.098, "params": 0.046, "infertime": 0.084, "train_error": 32.840, "val_error": 45.797, "memory": 47.555},
+            {"id": 70, "model": "PointNet", "family": "Pointwise", "case": "SupCavityFlame", "correlation": 0.76024, "test_error": 37.366, "params": 0.919, "infertime": 0.139, "train_error": 33.678, "val_error": 47.484, "memory": 47.991},
+            {"id": 71, "model": "Transolver", "family": "Transformer", "case": "SupCavityFlame", "correlation": 0.75247, "test_error": 37.939, "params": 0.186, "infertime": 0.186, "train_error": 30.625, "val_error": 40.065, "memory": 47.994},
+            {"id": 72, "model": "DeepONet", "family": "Pointwise", "case": "SymmCoaxFlame", "correlation": 0.81083, "test_error": 29.564, "params": 0.532, "infertime": 0.321, "train_error": 27.354, "val_error": 27.818, "memory": 15.755},
+            {"id": 73, "model": "GraphSAGE", "family": "Graph/Mesh", "case": "SymmCoaxFlame", "correlation": 0.21145, "test_error": 262.302, "params": 0.158, "infertime": 0.362, "train_error": 123.836, "val_error": 108.808, "memory": 15.779},
+            {"id": 74, "model": "GraphUNet", "family": "Graph/Mesh", "case": "SymmCoaxFlame", "correlation": 0.75175, "test_error": 108.752, "params": 0.895, "infertime": 32.650, "train_error": 51.304, "val_error": 44.092, "memory": 16.905},
+            {"id": 75, "model": "LSM", "family": "Spectral", "case": "SymmCoaxFlame", "correlation": 0.75888, "test_error": 35.544, "params": 118.718, "infertime": 0.798, "train_error": 29.637, "val_error": 27.304, "memory": 46.538},
+            {"id": 76, "model": "MGN", "family": "Graph/Mesh", "case": "SymmCoaxFlame", "correlation": 0.46385, "test_error": 241.239, "params": 0.601, "infertime": 0.380, "train_error": 118.875, "val_error": 122.949, "memory": 46.981},
+            {"id": 77, "model": "PointNet", "family": "Pointwise", "case": "SymmCoaxFlame", "correlation": 0.63945, "test_error": 85.111, "params": 3.672, "infertime": 0.772, "train_error": 88.038, "val_error": 68.667, "memory": 47.399},
+            {"id": 78, "model": "Transolver", "family": "Transformer", "case": "SymmCoaxFlame", "correlation": 0.69991, "test_error": 47.192, "params": 0.188, "infertime": 0.303, "train_error": 46.059, "val_error": 38.529, "memory": 47.414},
+            {"id": 79, "model": "DeepONet", "family": "Pointwise", "case": "FacadeFire", "correlation": 0.94302, "test_error": 24.957, "params": 0.332, "infertime": 0.212, "train_error": 28.477, "val_error": 35.691, "memory": 7.670},
+            {"id": 80, "model": "GraphSAGE", "family": "Graph/Mesh", "case": "FacadeFire", "correlation": 0.90851, "test_error": 34.703, "params": 0.061, "infertime": 0.134, "train_error": 42.819, "val_error": 46.395, "memory": 7.675},
+            {"id": 81, "model": "GraphUNet", "family": "Graph/Mesh", "case": "FacadeFire", "correlation": 0.93435, "test_error": 28.142, "params": 7.907, "infertime": 13.200, "train_error": 31.615, "val_error": 38.452, "memory": 22.457},
+            {"id": 82, "model": "MGN", "family": "Graph/Mesh", "case": "FacadeFire", "correlation": 0.90434, "test_error": 31.507, "params": 0.223, "infertime": 0.101, "train_error": 37.788, "val_error": 43.608, "memory": 22.487},
+            {"id": 83, "model": "PointNet", "family": "Pointwise", "case": "FacadeFire", "correlation": 0.92898, "test_error": 29.798, "params": 3.669, "infertime": 0.206, "train_error": 34.827, "val_error": 40.202, "memory": 22.490},
+            {"id": 84, "model": "Transolver", "family": "Transformer", "case": "FacadeFire", "correlation": 0.94152, "test_error": 26.387, "params": 0.035, "infertime": 0.157, "train_error": 31.790, "val_error": 36.741, "memory": 22.504},
+            {"id": 85, "model": "DeepONet", "family": "Pointwise", "case": "MultiCoaxFlame", "correlation": 0.70615, "test_error": 31.841, "params": 0.122, "infertime": 0.252, "train_error": 27.646, "val_error": 25.691, "memory": 15.880},
+            {"id": 86, "model": "GraphSAGE", "family": "Graph/Mesh", "case": "MultiCoaxFlame", "correlation": 0.02383, "test_error": 136.890, "params": 0.016, "infertime": 0.187, "train_error": 121.463, "val_error": 119.333, "memory": 15.907},
+            {"id": 87, "model": "GraphUNet", "family": "Graph/Mesh", "case": "MultiCoaxFlame", "correlation": 0.45859, "test_error": 107.016, "params": 0.895, "infertime": 14.353, "train_error": 99.223, "val_error": 98.823, "memory": 17.192},
+            {"id": 88, "model": "MGN", "family": "Graph/Mesh", "case": "MultiCoaxFlame", "correlation": 0.35686, "test_error": 111.171, "params": 0.046, "infertime": 0.128, "train_error": 99.316, "val_error": 97.224, "memory": 17.195},
+            {"id": 89, "model": "PointNet", "family": "Pointwise", "case": "MultiCoaxFlame", "correlation": 0.35799, "test_error": 86.455, "params": 0.921, "infertime": 0.206, "train_error": 77.517, "val_error": 73.888, "memory": 17.191},
+            {"id": 90, "model": "Transolver", "family": "Transformer", "case": "MultiCoaxFlame", "correlation": 0.67750, "test_error": 68.507, "params": 0.188, "infertime": 0.268, "train_error": 62.787, "val_error": 60.162, "memory": 17.193}
         ];
 
         // ==================== UTILITY FUNCTIONS ====================
@@ -1297,7 +1330,7 @@
                             </div>
                             <div class="stat-box">
                                 <div class="stat-label">Correlation</div>
-                                <div class="stat-value">${row.correlation.toFixed(5)}</div>
+                                <div class="stat-value">${row.correlation ? row.correlation.toFixed(5) : 'N/A'}</div>
                             </div>
                             <div class="stat-box">
                                 <div class="stat-label">Parameters (M)</div>
@@ -1306,6 +1339,10 @@
                             <div class="stat-box">
                                 <div class="stat-label">Inference Time (s)</div>
                                 <div class="stat-value">${row.infertime.toFixed(3)}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Memory (MB)</div>
+                                <div class="stat-value">${row.memory.toFixed(3)}</div>
                             </div>
                         </div>
                     </td>
